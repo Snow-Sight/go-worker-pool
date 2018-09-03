@@ -2,20 +2,24 @@ package wp
 
 import "fmt"
 
-// Queue is the top level struct
-// It provides access to both the Job Queue and
-// Stores the child dispatcher wich pulls jobs off the queue
+// Queue represents a worker pool.
+// The queue contains the dispatcher, housing the workers and the jobQueue to send jobs on.
 type Queue struct {
-	// JobQueue is the channel that jobs are sent over
-	jobQueue   chan Job
-	open       bool
+	// JobQueue is the channel that jobs are sent over.
+	jobQueue chan Job
+	// open marks whether the queue is able to be used.
+	open bool
+	// Dispatcher houses the workers and delegates jobs to them.
 	Dispatcher *Dispatcher
 }
 
-// NewQueue creates a new queue object
-// With a max number of workers and a max queue buffer
+// NewQueue creates a new queue object.
+// With a max number of workers and a max queue buffer.
 func NewQueue(maxWorkers int, maxQueue int) *Queue {
+	// Make the queue
 	q := make(chan Job, maxQueue)
+
+	// Return a pointer to the queue
 	return &Queue{
 		q,
 		true,
@@ -27,11 +31,12 @@ func NewQueue(maxWorkers int, maxQueue int) *Queue {
 	}
 }
 
-// QueueJob adds a job onto the end of the job queue
-// This is blocking and can take time
+// QueueJob adds a job onto the job channel.
+// This is blocking and can take time, if the channel is full.
+// QueueJob will error if the queue is closed.
 func (q *Queue) QueueJob(p Payload) error {
 	if !q.open {
-		return fmt.Errorf("Queue closed")
+		return ErrQueueClosed
 	}
 
 	q.jobQueue <- Job{Payload: p}
