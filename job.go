@@ -1,21 +1,15 @@
 package wp
 
-// Payload is the thing being executed
-// It is part of the Job and is a subsection
+// Payload represents an interface executed by the worker.
+// Exec is called on the interface to run the job.
+// If Exec returns an error, OnError is called.
 type Payload interface {
 	Exec() error
 	OnError(error)
 }
 
-// Job represents the job to be run
+// Job represents a job to be run by a worker.
+// Job wraps a payload so that additional data can be added if need be.
 type Job struct {
-	// JobSpec *JobSpec
-	// The payload can be anything
-	// This allows for the job executor to have access to whatever data it needs
 	Payload Payload
 }
-
-// NewJob prepares a new job with the provided payload
-// func NewJob(p Payload) Job {
-// 	return Job{p}
-// }
