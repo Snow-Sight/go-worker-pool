@@ -1,7 +1,5 @@
 package wp
 
-import "fmt"
-
 // Queue represents a worker pool.
 // The queue contains the dispatcher, housing the workers and the jobQueue to send jobs on.
 type Queue struct {
