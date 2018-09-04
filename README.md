@@ -1,5 +1,7 @@
 # Golang Worker Pool Module
 
+![Rick And Morty Pool](https://github.com/ashleymcnamara/gophers/raw/master/RickAndMorty.png)
+
 The golang-worker-pool package or wp aims to provide a simple, prepackaged Golang worker pool.
 The initial pattern is inspired by this blog post from [marcio.io](http://marcio.io/2015/07/handling-1-million-requests-per-minute-with-golang/).
 
