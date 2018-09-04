@@ -1,0 +1,58 @@
+version: 2
+jobs:
+  build:
+    docker:
+            - image: circleci/golang:1.11
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "go.mod" }}
+      - run:
+          name: Fetch dependencies
+          command: |
+            export GO111MODULE=on
+            go mod vendor
+      - save_cache:
+          key: dependency-cache-{{ checksum "go.mod" }}
+          paths:
+            - ./vendor/
+  lint:
+    docker:
+            - image: circleci/golang:1.11
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "go.mod" }}
+      - run:
+          name: Lint
+          command: golint
+  test:
+    docker:
+        - image: circleci/golang:1.11
+    steps:
+      - checkout
+      - restore_cache:
+              key: dependency-cache-{{ checksum "go.mod" }}
+      - run:
+              name: Test and cover
+              command: go test -coverprofile cover.out
+      - run:
+              name: HTML Coverage
+              command: go tool cover -o cover.html -html=cover.out
+      - store_artifacts:
+          path: cover.out
+          destination: cover.out
+      - store_artifacts:
+          path: cover.html
+          destination: cover.html
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - lint:
+          requires:
+             - build
+      - test:
+          requires:
+             - build
