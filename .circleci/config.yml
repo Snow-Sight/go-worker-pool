@@ -53,6 +53,19 @@ jobs:
               command: |
                       go test -race -coverprofile=coverage.txt -covermode=atomic
                       bash <(curl -s https://codecov.io/bash)
+  test_cyclo:
+    docker:
+        - image: circleci/golang:1.11
+    steps:
+      - checkout
+      - restore_cache:
+              key: dependency-cache-{{ checksum "go.mod" }}
+      - run:
+              name: Get Gocyclo
+              command: go get github.com/fzipp/gocyclo
+      - run:
+              name: Run GoCyclo
+              command: gocyclo .
 workflows:
   version: 2
   build_and_test:
@@ -62,5 +75,8 @@ workflows:
           requires:
              - build
       - test:
+          requires:
+             - build
+      - test_cyclo:
           requires:
              - build
